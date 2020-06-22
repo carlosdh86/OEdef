@@ -1,6 +1,5 @@
-package com.cice.login.datasource;
+package com.cice.datasource;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,6 @@ public class Datasource {
                 log.info("Usuario o contraseña incorrectos");
                 response=false;
                 return response;
-
             }
 
         } catch (SQLException e) {
