@@ -9,6 +9,7 @@ import com.cice.model.Customer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.SQLException;
 
 public class CustomerDaoImpl implements ICustomerDao {
 
@@ -21,19 +22,35 @@ public class CustomerDaoImpl implements ICustomerDao {
         System.out.println(myconnection);
     }
 
-    public boolean create(Customer customer) {
-        return false;
+    public boolean create(Customer customer) throws SQLException{
+
+        boolean isCreated = false;
+
+        try {
+            stm = myconnection.prepareStatement("INSERT INTO CUSTOMERS (CUSTOMER_ID , CUST_FIRST_NAME , CUST_LAST_NAME) VALUES (?,?,?)");
+            stm.setInt(1, customer.getCustomer_id());
+            stm.setString(2, customer.getCust_first_name());
+            stm.setString(3, customer.getCust_last_name());
+
+            stm.execute();
+
+            isCreated = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isCreated;
     }
 
-    public List<Customer> read() {
+    public List<Customer> read () {
 
         String sql="SELECT * FROM CUSTOMERS ORDER BY 1";
 
         List<Customer> customerList = new ArrayList<Customer>();
 
         try {
-            stm=myconnection.prepareStatement(sql);
-            rs=stm.executeQuery(sql);
+            stm = myconnection.prepareStatement(sql);
+            rs = stm.executeQuery(sql);
             while (rs.next()) {
                 Customer customer = new Customer();
                 customer.setCustomer_id(rs.getInt(1));
@@ -51,15 +68,9 @@ public class CustomerDaoImpl implements ICustomerDao {
                 System.out.println(customer);
                 customerList.add(customer);
             }
-
-                //System.out.println("Customer id: "+rs.getInt(1));
-                //System.out.println("Customer first name: "+rs.getString(2));
-                //System.out.println("Customer last name: "+rs.getString(3));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        //System.out.println(customerList);
 
         return customerList;
     }

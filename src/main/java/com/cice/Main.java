@@ -4,6 +4,7 @@ import com.cice.connection.MyConnection;
 import com.cice.controller.CustomerController;
 import com.cice.dao.CustomerDaoImpl;
 import com.cice.idao.ICustomerDao;
+import com.cice.view.CustomerView;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class Main {
         return myConnection;
     }
 
-    public static void main (String[] args) {
+    public static void main (String[] args) throws SQLException {
         BasicConfigurator.configure();
 
         while (myConnection==null) {
@@ -47,18 +48,19 @@ public class Main {
         log.info("Login correcto, ahora elige una acción");
 
 
-    log.info("Elige una opción: \1:mostrar todos los clientes  \2:nada");
+    log.info("Elige una opción: \1:añadir cliente  \2:mostrar todos los clientes");
     Scanner sc2 = new Scanner(System.in);
     int option = sc2.nextInt();
+    CustomerController customerController = new CustomerController();
+    CustomerView customerView = new CustomerView();
 
     switch (option) {
         case 1:
-            CustomerController customerController = new CustomerController();
-            customerController.getCustomers();
+            customerView.createCustomer();
             break;
 
         case 2:
-
+            customerController.getCustomers();
             break;
 
         default:
