@@ -1,9 +1,5 @@
 package com.cice.dao;
-
-import com.cice.Main;
 import com.cice.connection.MyConnection;
-import com.cice.controller.ConnectionController;
-import com.cice.datasource.Datasource;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
 
@@ -19,11 +15,7 @@ public class CustomerDaoImpl implements ICustomerDao {
     public static ResultSet rs = null;
 
 
-    public static void verconexion () {
-        System.out.println(myconnection);
-    }
-
-    public boolean create(Customer customer) throws SQLException{
+    public boolean createCustomer(Customer customer) throws SQLException{
 
         boolean isCreated = false;
 
@@ -43,15 +35,14 @@ public class CustomerDaoImpl implements ICustomerDao {
         return isCreated;
     }
 
-    public List<Customer> read () {
 
-        String sql="SELECT * FROM CUSTOMERS ORDER BY 1";
+    public List<Customer> getCustomers() {
 
         List<Customer> customerList = new ArrayList<Customer>();
 
         try {
-            stm = myconnection.prepareStatement(sql);
-            rs = stm.executeQuery(sql);
+            stm = myconnection.prepareStatement("SELECT * FROM CUSTOMERS ORDER BY 1");
+            rs = stm.executeQuery();
             while (rs.next()) {
                 Customer customer = new Customer();
                 customer.setCustomer_id(rs.getInt(1));
@@ -76,11 +67,45 @@ public class CustomerDaoImpl implements ICustomerDao {
         return customerList;
     }
 
-    public boolean update(Customer customer) {
+    public List<Customer> getCustomerById(String lastName) {
+
+        List<Customer> customerList = new ArrayList<Customer>();
+
+        try {
+            stm = myconnection.prepareStatement("SELECT * FROM CUSTOMERS WHERE CUST_LAST_NAME=?");
+            stm.setString(1, lastName);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+                Customer customer = new Customer();
+                customer.setCustomer_id(rs.getInt(1));
+                customer.setCust_first_name(rs.getString(2));
+                customer.setCust_last_name(rs.getString(3));
+                customer.setNls_language(rs.getString(4));
+                customer.setNls_territory(rs.getString(5));
+                customer.setCredit_limit(rs.getInt(6));
+                customer.setCust_email(rs.getString(7));
+                customer.setAccount_mgr_id(rs.getInt(8));
+                customer.setDate_of_bird(rs.getDate(9));
+                customer.setMarital_status(rs.getString(10));
+                customer.setGender(rs.getString(11));
+                customer.setIncome_level(rs.getString(12));
+                System.out.println(customer);
+                customerList.add(customer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return customerList;
+    }
+
+    public boolean updateCustomer(Customer customer) {
         return false;
     }
 
-    public boolean delete(Customer customer) {
+    public boolean deleteCustomer(Customer customer) {
+
         return false;
     }
 }

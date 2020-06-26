@@ -1,7 +1,5 @@
 package com.cice.view;
 
-import com.cice.Main;
-import com.cice.controller.ConnectionController;
 import com.cice.controller.CustomerController;
 import com.cice.dao.CustomerDaoImpl;
 import com.cice.idao.ICustomerDao;
@@ -40,24 +38,39 @@ public class CustomerView {
 
             case 2:
                         CustomerController customerController = new CustomerController();
-                        customerController.getCustomers();
-                        break;
+                        log.info("¿Qué clientes quieres consultar?");
+                        log.info("1-:Todos");
+                        log.info("2-:Filtrar por apellido");
+                        Scanner sc2 = new Scanner(System.in);
+                        int option2 = sc2.nextInt();
+                        switch (option2) {
+                            case 1:
+                                customerController.getCustomers();
+                                break;
+                            case 2:
+                                log.info("Introduce el apellido");
+                                Scanner sc3 = new Scanner(System.in);
+                                String lastName = sc3.next();
+                                customerController.getCustomersByLastName(lastName);
+                                break;
+                            }
+                            break;
 
             case 5:
 
-                Main.appStart();
+                InitialView.appStart();
 
                 break;
         }
 
     }
 
-    public void getCustomers (List<Customer> customers) {
 
-        for (Customer customer:customers) {
+    public void getCustomersById (List<Customer> customers) {
+
+        for (Customer customer:customers)  {
             System.out.println("Datos del cliente: "+customer);
         }
-
     }
 
     public void createCustomer() throws SQLException {
@@ -81,7 +94,7 @@ public class CustomerView {
 
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
 
-        boolean isCreated = iCustomerDao.create(customer);
+        boolean isCreated = iCustomerDao.createCustomer(customer);
         if (isCreated) {
             log.info("Usuario " +customer_id+ " registrado con éxito");
         }

@@ -6,9 +6,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ICustomerDao {
-    public boolean create (Customer customer) throws SQLException;
-    public List<Customer> read();
-    public boolean update(Customer customer);
-    public boolean delete(Customer customer);
+    public boolean createCustomer (Customer customer) throws SQLException;
+    public List<Customer> getCustomers();
+    public List<Customer> getCustomerById (String lastName);
+    public boolean updateCustomer(Customer customer);
+    public boolean deleteCustomer(Customer customer);
+
 
 }
