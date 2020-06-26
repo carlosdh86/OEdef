@@ -2,6 +2,7 @@ package com.cice.dao;
 
 import com.cice.Main;
 import com.cice.connection.MyConnection;
+import com.cice.controller.ConnectionController;
 import com.cice.datasource.Datasource;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 
 public class CustomerDaoImpl implements ICustomerDao {
 
-    public static Connection myconnection = Main.getMyConnection();
+    public static Connection myconnection = MyConnection.getMyConnection();
     public static PreparedStatement stm = null;
     public static ResultSet rs = null;
 

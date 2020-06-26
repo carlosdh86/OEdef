@@ -1,6 +1,8 @@
 package com.cice.view;
 
 import com.cice.Main;
+import com.cice.controller.ConnectionController;
+import com.cice.controller.CustomerController;
 import com.cice.dao.CustomerDaoImpl;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
@@ -15,10 +17,47 @@ public class CustomerView {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerView.class);
 
+    public static void chooseAction () throws SQLException {
+        log.info("Elige la acción que quieres realizar sobre clientes");
+        log.info("-1:Crear cliente");
+        log.info("-2:Consultar cliente");
+        log.info("-3:Modificar cliente");
+        log.info("-4:Borrar cliente");
+        log.info("-5:Volver al menú principal");
+        Scanner sc = new Scanner(System.in);
+        int option = sc.nextInt();
+
+        switch (option) {
+
+            case 1:
+                CustomerView customerView = new CustomerView();
+                        try {
+                            customerView.createCustomer();
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                break;
+
+            case 2:
+                        CustomerController customerController = new CustomerController();
+                        customerController.getCustomers();
+                        break;
+
+            case 5:
+
+                Main.appStart();
+
+                break;
+        }
+
+    }
+
     public void getCustomers (List<Customer> customers) {
+
         for (Customer customer:customers) {
             System.out.println("Datos del cliente: "+customer);
         }
+
     }
 
     public void createCustomer() throws SQLException {

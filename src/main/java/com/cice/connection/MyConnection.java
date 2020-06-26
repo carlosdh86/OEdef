@@ -1,4 +1,5 @@
 package com.cice.connection;
+import com.cice.controller.ConnectionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,39 +19,40 @@ public class MyConnection {
         try {
         Class.forName("oracle.jdbc.OracleDriver");
         myConnection = DriverManager.getConnection(url, user, pass);
-            System.out.println(myConnection);
-            System.out.println("hola");
-
-
          } catch (
             SQLException e) {
             e.printStackTrace();
-
-
          } catch (ClassNotFoundException e) {
              e.printStackTrace();
          }
 
         return myConnection;
+    }
+
+    public static void disconnect (Connection myConnection) {
+
+        try {
+            myConnection.close();
+            setMyConnection(null);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+
+    public static Connection getMyConnection() {
+
+        return myConnection;
 
     }
 
-    /*public static boolean isLogin (String user String pass) throws SQLException, ClassNotFoundException{
+    public static void setMyConnection(Connection myConnection) {
 
-        boolean response = false;
+        MyConnection.myConnection =myConnection;
 
-            if (connection != null) {
-                log.info("Has hecho login");
-                response=true;
-                System.out.println(response);
-                return response;
-            } else {
-                log.info("Usuario o contraseña incorrectos");
-                response=false;
-                return response;
-            }
+    }
 
-        } */
 
 
 }

@@ -4,7 +4,6 @@ import com.cice.dao.CustomerDaoImpl;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
 import com.cice.view.CustomerView;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
