@@ -16,27 +16,17 @@ public class CustomerController {
 
         customerView.createCustomer();
     }
-
-
+    
     public void getCustomers() {
         List<Customer> customers = new ArrayList<Customer>();
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
         customers = iCustomerDao.getCustomers();
-        //customerView.getCustomers(customers);
-        for (Customer customer:customers) {
-            System.out.println("Datos del cliente: "+customer);
-        }
     }
 
     public void getCustomersByLastName(String lastName){
         List<Customer> customers = new ArrayList<Customer>();
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
         customers = iCustomerDao.getCustomerById(lastName);
-        //customerView.getCustomersById(customers);
-        for (Customer customer:customers) {
-            System.out.println("Datos del cliente: "+customer);
-        }
-
     }
 
 }

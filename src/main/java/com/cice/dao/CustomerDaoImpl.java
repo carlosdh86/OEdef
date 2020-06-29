@@ -20,10 +20,9 @@ public class CustomerDaoImpl implements ICustomerDao {
         boolean isCreated = false;
 
         try {
-            stm = myconnection.prepareStatement("INSERT INTO CUSTOMERS (CUSTOMER_ID , CUST_FIRST_NAME , CUST_LAST_NAME) VALUES (?,?,?)");
-            stm.setInt(1, customer.getCustomer_id());
-            stm.setString(2, customer.getCust_first_name());
-            stm.setString(3, customer.getCust_last_name());
+            stm = myconnection.prepareStatement("INSERT INTO CUSTOMERS (CUSTOMER_ID , CUST_FIRST_NAME , CUST_LAST_NAME) VALUES (NULL,?,?)");
+            stm.setString(1, customer.getCust_first_name());
+            stm.setString(2, customer.getCust_last_name());
 
             stm.execute();
 
@@ -100,12 +99,45 @@ public class CustomerDaoImpl implements ICustomerDao {
         return customerList;
     }
 
-    public boolean updateCustomer(Customer customer) {
-        return false;
+    public boolean updateCustomer(int customerID, String cust_first_name, String cust_last_name, int credit_limit, String cust_email, int accountManagerId, Date sqlBirthday,
+                                  String maritalStatus, String gender, String incomeLevel) throws SQLException {
+        boolean isUpdated=false;
+
+        try {
+            stm = myconnection.prepareStatement(" UPDATE CUSTOMERS SET CUST_FIRST_NAME=?,CUST_LAST_NAME=?,CREDIT_LIMIT=?,CUST_EMAIL=?,ACCOUNT_MGR_ID=?,DATE_OF_BIRTH=?,MARITAL_STATUS=?,GENDER=?,INCOME_LEVEL=? WHERE CUSTOMER_ID=? ");
+            stm.setString(1,cust_first_name);
+            stm.setString(2,cust_last_name);
+            stm.setInt(3,credit_limit);
+            stm.setString(4,cust_email);
+            stm.setInt(5,accountManagerId);
+            stm.setDate(6,sqlBirthday);
+            stm.setString(7,maritalStatus);
+            stm.setString(8,gender);
+            stm.setString(9,incomeLevel);
+            stm.setInt(10,customerID);
+            rs = stm.executeQuery();
+            if(rs!=null) {
+                isUpdated = true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isUpdated;
     }
 
-    public boolean deleteCustomer(Customer customer) {
+    public boolean deleteCustomer(int customerID) {
 
-        return false;
+        boolean isDeleted=false;
+
+        try {
+            stm = myconnection.prepareStatement("DELETE FROM CUSTOMERS WHERE CUSTOMER_ID=?");stm.setInt(1, customerID);
+            rs = stm.executeQuery();
+            isDeleted=true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return isDeleted;
     }
 }

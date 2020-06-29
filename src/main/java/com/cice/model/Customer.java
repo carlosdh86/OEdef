@@ -20,7 +20,7 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(int customer_id, String cust_first_name, String cust_last_name, String nsl_language, String nls_territory, int credit_limit, String cust_email, int account_mgr_id, Date date_of_bird, String marital_status, String gender, String income_level) {
+    public Customer(int customer_id, String cust_first_name, String cust_last_name, String nls_language, String nls_territory, int credit_limit, String cust_email, int account_mgr_id, Date date_of_bird, String marital_status, String gender, String income_level) {
         this.customer_id = customer_id;
         this.cust_first_name = cust_first_name;
         this.cust_last_name = cust_last_name;

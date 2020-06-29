@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class CustomerView {
@@ -34,7 +36,7 @@ public class CustomerView {
                         } catch (SQLException throwables) {
                             throwables.printStackTrace();
                         }
-                break;
+                chooseAction();
 
             case 2:
                         CustomerController customerController = new CustomerController();
@@ -46,38 +48,32 @@ public class CustomerView {
                         switch (option2) {
                             case 1:
                                 customerController.getCustomers();
-                                break;
+                                chooseAction();
                             case 2:
                                 log.info("Introduce el apellido");
                                 Scanner sc3 = new Scanner(System.in);
                                 String lastName = sc3.next();
                                 customerController.getCustomersByLastName(lastName);
-                                break;
+                                chooseAction();
                             }
-                            break;
+
+            case 3:
+                CustomerView customerView2 = new CustomerView();
+                customerView2.updateCustomer();
+                chooseAction();
+
+            case 4:
+                CustomerView customerView3 = new CustomerView();
+                customerView3.deleteCustomer();
+                chooseAction();
 
             case 5:
-
                 InitialView.appStart();
-
-                break;
         }
 
-    }
-
-
-    public void getCustomersById (List<Customer> customers) {
-
-        for (Customer customer:customers)  {
-            System.out.println("Datos del cliente: "+customer);
-        }
     }
 
     public void createCustomer() throws SQLException {
-
-        log.info("Introduce ID del cliente");
-        Scanner sc = new Scanner(System.in);
-        int customer_id = sc.nextInt();
 
         log.info("Introduce nombre del cliente");
         Scanner sc2 = new Scanner(System.in);
@@ -88,7 +84,6 @@ public class CustomerView {
         String cust_last_name = sc3.next();
 
         Customer customer = new Customer();
-        customer.setCustomer_id(customer_id);
         customer.setCust_first_name(cust_first_name);
         customer.setCust_last_name(cust_last_name);
 
@@ -96,9 +91,83 @@ public class CustomerView {
 
         boolean isCreated = iCustomerDao.createCustomer(customer);
         if (isCreated) {
-            log.info("Usuario " +customer_id+ " registrado con éxito");
+            log.info("Usuario " + cust_first_name + " " + cust_last_name + " registrado con éxito");
         }
     }
+
+    public void deleteCustomer() throws SQLException{
+
+        log.info("Introduce ID del cliente que quieres borrar");
+        Scanner sc4 = new Scanner(System.in);
+        int customerId= sc4.nextInt();
+
+        ICustomerDao iCustomerDao = new CustomerDaoImpl();
+        boolean isDeleted = iCustomerDao.deleteCustomer(customerId);
+        if(isDeleted) {
+            log.info("Usuario " + customerId + " eliminado con éxito");
+        }
+    }
+
+    public void updateCustomer() throws SQLException {
+
+        log.info("Introduce ID del cliente que quieres actualizar");
+        Scanner sc5 = new Scanner(System.in);
+        int customerId = sc5.nextInt();
+        ICustomerDao iCustomerDao = new CustomerDaoImpl();
+        log.info("Introduce los nuevos datos del cliente. Deja en blanco los datos que no quieras actualizar");
+        log.info("Introduce el nombre");
+        Scanner sc6 = new Scanner(System.in);
+        String customerFirstName = sc6.next();
+        log.info("Introduce el apellido");
+        Scanner sc7 = new Scanner(System.in);
+        String customerLastName = sc7.next();
+        log.info("Introduce el límite de crédito ");
+        Scanner sc8 = new Scanner(System.in);
+        int creditLimit = sc8.nextInt();
+        log.info("Introduce el email");
+        Scanner sc9 = new Scanner(System.in);
+        String email = sc9.next();
+        log.info("Introduce ID del manager");
+        Scanner sc10 = new Scanner(System.in);
+        int managerID = sc10.nextInt();
+        log.info("Introduce fecha de nacimiento en formato dd/mm/aaaa");
+        Scanner sc11 = new Scanner(System.in);
+        String birthDayString = sc11.next();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date JavaBirthDay = null;
+        try {
+            JavaBirthDay = sdf.parse(birthDayString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        java.sql.Date SqlBirthDay = convert(JavaBirthDay);
+        log.info("Introduce estado civil");
+        Scanner sc12 = new Scanner(System.in);
+        String maritalStatus = sc12.next();
+        log.info("Introduce sexo");
+        Scanner sc13 = new Scanner(System.in);
+        String gender = sc13.next();
+        log.info("Introduce nivel de ingresos");
+        Scanner sc14 = new Scanner(System.in);
+        String incomeLevel = sc14.next();
+
+        CustomerDaoImpl customerDao = new CustomerDaoImpl();
+        boolean isUpdated = customerDao.updateCustomer(customerId,customerFirstName,customerLastName,creditLimit,email,
+                managerID,SqlBirthDay,maritalStatus,gender,incomeLevel);
+
+        if(isUpdated) {
+            log.info("Usuario " + customerId + " modificado con éxito");
+        }
+
+
+
+    }
+
+    private static java.sql.Date convert(java.util.Date JavaDate) {
+        java.sql.Date SqlDate = new java.sql.Date(JavaDate.getTime());
+        return SqlDate;
+    }
+
 
 
 }
