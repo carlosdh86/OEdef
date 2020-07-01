@@ -27,13 +27,13 @@ public class OrderDaoImpl implements IOrderDao {
     public static ResultSet rs7 = null;
 
 
-    public boolean createOrder(Order order, boolean isStarted) throws SQLException {
-        boolean isCreated = false;
+    public boolean createOrder(Order order, boolean isCreated) throws SQLException {
+        isCreated = false;
+        float productPrice=0;
         float orderTotalBefore=0;
         float orderTotalAfter=0;
-        float productPrice=0;
 
-        while (!isStarted) {
+        while (!isCreated) {
 
             try {
 
@@ -54,7 +54,7 @@ public class OrderDaoImpl implements IOrderDao {
             }catch (SQLException e) {
                 e.printStackTrace();
             }
-            isStarted = true;
+            isCreated = true;
         }
 
         try {

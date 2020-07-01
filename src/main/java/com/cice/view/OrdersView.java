@@ -5,9 +5,7 @@ import com.cice.dao.CustomerDaoImpl;
 import com.cice.dao.OrderDaoImpl;
 import com.cice.idao.ICustomerDao;
 import com.cice.idao.IOrderDao;
-import com.cice.model.Customer;
 import com.cice.model.Order;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
