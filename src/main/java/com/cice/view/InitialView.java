@@ -27,6 +27,7 @@ public class InitialView {
         int option = sc.nextInt();
         CustomerController customerController = new CustomerController();
         CustomerView customerView = new CustomerView();
+        OrdersView ordersView = new OrdersView();
 
         switch (option) {
             case 1:
@@ -34,6 +35,7 @@ public class InitialView {
                 break;
 
             case 2:
+                ordersView.chooseAction();
                 break;
 
             case 3:

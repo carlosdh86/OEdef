@@ -40,7 +40,6 @@ public class MyConnection {
         }
     }
 
-
     public static Connection getMyConnection() {
 
         return myConnection;

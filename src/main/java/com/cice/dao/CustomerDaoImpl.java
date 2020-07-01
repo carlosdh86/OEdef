@@ -2,7 +2,6 @@ package com.cice.dao;
 import com.cice.connection.MyConnection;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
