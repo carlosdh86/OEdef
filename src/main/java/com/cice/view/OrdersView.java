@@ -111,9 +111,9 @@ public class OrdersView {
             if (isCreated) {
                 log.info("Producto añadido al pedido con éxito");
 
-            log.info("¿Has acabado ya este pedido?");
-            log.info("1- No, quiero añadir más productos");
-            log.info("2- Sí, quiero finalizar este pedido");
+                log.info("¿Has acabado ya este pedido?");
+                log.info("1- No, quiero añadir más productos");
+                log.info("2- Sí, quiero finalizar este pedido");
 
             Scanner sc7 = new Scanner(System.in);
             int option = sc7.nextInt();

@@ -16,19 +16,29 @@ public class OrderDaoImpl implements IOrderDao {
     public static PreparedStatement stm3 = null;
     public static PreparedStatement stm4 = null;
     public static PreparedStatement stm5 = null;
+    public static PreparedStatement stm6 = null;
+    public static PreparedStatement stm7 = null;
+    public static PreparedStatement stm8 = null;
+    public static PreparedStatement stm9 = null;
     public static ResultSet rs2 = null;
     public static ResultSet rs4 = null;
+    public static ResultSet rs5 = null;
+    public static ResultSet rs6 = null;
+    public static ResultSet rs7 = null;
 
 
     public boolean createOrder(Order order, boolean isStarted) throws SQLException {
         boolean isCreated = false;
+        float orderTotalBefore=0;
+        float orderTotalAfter=0;
+        float productPrice=0;
 
         while (!isStarted) {
 
             try {
 
-                stm = myconnection.prepareStatement("INSERT INTO ORDERS (ORDER_ID, ORDER_DATE , ORDER_MODE , CUSTOMER_ID , ORDER_STATUS, SALES_REP_ID)" +
-                        "VALUES (NULL , CURRENT_TIMESTAMP , ? , ? , 0 , ?) ");
+                stm = myconnection.prepareStatement("INSERT INTO ORDERS (ORDER_ID, ORDER_DATE , ORDER_MODE , CUSTOMER_ID , ORDER_STATUS, ORDER_TOTAL, SALES_REP_ID)" +
+                        "VALUES (NULL , CURRENT_TIMESTAMP , ? , ? , 0 , 0 , ?) ");
                 stm.setString(1, order.getOrder_mode());
                 stm.setInt(2, order.getCustomer_id());
                 stm.setInt(3, order.getSales_rep_id());
@@ -48,8 +58,17 @@ public class OrderDaoImpl implements IOrderDao {
         }
 
         try {
+            stm5 = myconnection.prepareStatement("SELECT LIST_PRICE FROM PRODUCT_INFORMATION WHERE PRODUCT_ID=?");
+            stm5.setInt(1,order.getProduct_id());
+            rs5 = stm5.executeQuery();
 
-            stm3 = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,QUANTITY) VALUES ( ? , ? , ? , ?)");
+            if (rs5.next()) {
+                productPrice=(rs5.getFloat(1));
+                System.out.println("El precio del producto es: " + productPrice + " €");
+            }
+
+
+            stm3 = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,UNIT_PRICE,QUANTITY) VALUES ( ? , ? , ? , ? , ?)");
             stm3.setInt(1, order.getOrder_id());
             stm4= myconnection.prepareStatement("SELECT LINE_ITEM_ID FROM ORDER_ITEMS WHERE ORDER_ID = ? AND rownum <= 1 ORDER BY LINE_ITEM_ID DESC");
             stm4.setInt(1,order.getOrder_id());
@@ -59,23 +78,60 @@ public class OrderDaoImpl implements IOrderDao {
                 line_item_id=line_item_id+1;
                 System.out.println("lA Nena BONITA ES: " + line_item_id);
                 stm3.setInt(2, line_item_id);
-                stm3.setInt(2, line_item_id);
                 stm3.setInt(3, order.getProduct_id());
-                stm3.setInt(4, order.getQuantity());
+                stm3.setFloat(4, productPrice);
+                stm3.setInt(5, order.getQuantity());
                 stm3.execute();
+
+                stm6 = myconnection.prepareStatement("SELECT ORDER_TOTAL FROM ORDERS WHERE ORDER_ID=?");
+                stm6.setInt(1,order.getOrder_id());
+                rs6 = stm6.executeQuery();
+               if (rs6.next()) {
+                    orderTotalBefore = (rs6.getFloat(1));
+                    orderTotalAfter = orderTotalBefore + productPrice * order.getQuantity();
+                }
+
+               stm7 = myconnection.prepareStatement("UPDATE ORDERS SET ORDER_TOTAL=? WHERE ORDER_ID=?");
+               stm7.setFloat(1,orderTotalAfter);
+               stm7.setInt(2,order.getOrder_id());
+               rs7 = stm7.executeQuery();
+               if (rs7.next()) {
+                    orderTotalBefore = (rs6.getFloat(1));
+                    orderTotalAfter = orderTotalBefore + productPrice * order.getQuantity();
+                   System.out.println("Lo que llevo ahora de pedido es: " + orderTotalAfter + " €");
+                }
+
+
             }else{
                 int line_item_id=1;
                 System.out.println("lA Nena BONITA ES: " + line_item_id);
                 stm3.setInt(2, line_item_id);
                 stm3.setInt(3, order.getProduct_id());
-                stm3.setInt(4, order.getQuantity());
+                stm3.setFloat(4, productPrice);
+                stm3.setInt(5, order.getQuantity());
                 stm3.execute();
+
+                stm6 = myconnection.prepareStatement("SELECT ORDER_TOTAL FROM ORDERS WHERE ORDER_ID=?");
+                stm6.setInt(1,order.getOrder_id());
+                rs6 = stm6.executeQuery();
+                if (rs6.next()) {
+                    orderTotalBefore = (rs6.getFloat(1));
+                    orderTotalAfter = orderTotalBefore + productPrice * order.getQuantity();
+                }
+
+                stm7 = myconnection.prepareStatement("UPDATE ORDERS SET ORDER_TOTAL=? WHERE ORDER_ID=?");
+                stm7.setFloat(1,orderTotalAfter);
+                stm7.setInt(2,order.getOrder_id());
+                rs7 = stm7.executeQuery();
+                if (rs7.next()) {
+                    orderTotalBefore = (rs6.getFloat(1));
+                    orderTotalAfter = orderTotalBefore + productPrice * order.getQuantity();
+                    System.out.println("Lo que llevo ahora de pedido es: " + orderTotalAfter + " €");
+                }
+
             }
 
             isCreated=true;
-            stm5 = myconnection.prepareStatement("UPDATE SET O");
-
-
 
         } catch (SQLException e) {
             e.printStackTrace();
