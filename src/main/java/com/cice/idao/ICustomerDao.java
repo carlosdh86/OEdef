@@ -10,8 +10,7 @@ public interface ICustomerDao {
     public boolean createCustomer (Customer customer) throws SQLException;
     public List<Customer> getCustomers();
     public List<Customer> getCustomerById (String lastName);
-    public boolean updateCustomer(int customerID, String cust_first_name, String cust_last_name, int credit_limit, String cust_email,
-                                  int accountManagerId, Date dateOfBirth, String maritalStatus, String gender, String incomeLevel) throws SQLException;
+    public boolean updateCustomer(Customer customer, int field) throws SQLException;
     public boolean deleteCustomer(int customerID);
 
 

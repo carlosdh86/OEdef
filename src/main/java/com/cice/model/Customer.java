@@ -12,7 +12,7 @@ public class Customer {
     int credit_limit;
     String cust_email;
     int account_mgr_id;
-    Date date_of_bird;
+    Date date_of_birth;
     String marital_status;
     String gender;
     String income_level;
@@ -20,7 +20,7 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(int customer_id, String cust_first_name, String cust_last_name, String nls_language, String nls_territory, int credit_limit, String cust_email, int account_mgr_id, Date date_of_bird, String marital_status, String gender, String income_level) {
+    public Customer(int customer_id, String cust_first_name, String cust_last_name, String nls_language, String nls_territory, int credit_limit, String cust_email, int account_mgr_id, Date date_of_birth, String marital_status, String gender, String income_level) {
         this.customer_id = customer_id;
         this.cust_first_name = cust_first_name;
         this.cust_last_name = cust_last_name;
@@ -29,7 +29,7 @@ public class Customer {
         this.credit_limit = credit_limit;
         this.cust_email = cust_email;
         this.account_mgr_id = account_mgr_id;
-        this.date_of_bird = date_of_bird;
+        this.date_of_birth = date_of_birth;
         this.marital_status = marital_status;
         this.gender = gender;
         this.income_level = income_level;
@@ -99,12 +99,12 @@ public class Customer {
         this.account_mgr_id = account_mgr_id;
     }
 
-    public Date getDate_of_bird() {
-        return date_of_bird;
+    public Date getDate_of_birth() {
+        return date_of_birth;
     }
 
-    public void setDate_of_bird(Date date_of_bird) {
-        this.date_of_bird = date_of_bird;
+    public void setDate_of_birth(Date date_of_birth) {
+        this.date_of_birth = date_of_birth;
     }
 
     public String getMarital_status() {
@@ -142,7 +142,7 @@ public class Customer {
                 ", credit_limit=" + credit_limit +
                 ", cust_email='" + cust_email + '\'' +
                 ", account_mgr_id=" + account_mgr_id +
-                ", date_of_bird=" + date_of_bird +
+                ", date_of_birth=" + date_of_birth +
                 ", marital_status='" + marital_status + '\'' +
                 ", gender='" + gender + '\'' +
                 ", income_level='" + income_level + '\'' +

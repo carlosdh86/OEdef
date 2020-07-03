@@ -106,7 +106,7 @@ public class CustomerView {
         int customerId= sc4.nextInt();
 
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
-        boolean isDeleted = iCustomerDao.deleteCustomer(customerId);
+        isDeleted = iCustomerDao.deleteCustomer(customerId);
         if(isDeleted) {
             log.info("Usuario " + customerId + " eliminado con éxito");
         }
@@ -114,56 +114,99 @@ public class CustomerView {
 
     public void updateCustomer() throws SQLException {
 
-        log.info("Introduce ID del cliente que quieres actualizar");
+        Customer customer = new Customer();
+
+        log.info("Introduce ID del cliente que quieres modificar");
         Scanner sc5 = new Scanner(System.in);
-        int customerId = sc5.nextInt();
-        ICustomerDao iCustomerDao = new CustomerDaoImpl();
-        log.info("Introduce los nuevos datos del cliente. Deja en blanco los datos que no quieras actualizar");
-        log.info("Introduce el nombre");
+        customer.setCustomer_id(sc5.nextInt());
+
+        log.info("Elige el dato que quieres modificar sobre el cliente nº " + customer.getCustomer_id());
+        log.info("-1: Nombre");
+        log.info("-2: Primer apellido");
+        log.info("-3: Límite de crédito");
+        log.info("-4: Email");
+        log.info("-5: ID de su asesor comercial");
+        log.info("-6: Fecha de nacimiento");
+        log.info("-7: Estado civil");
+        log.info("-8: Sexo");
+        log.info("-9: Nivel de ingresos");
+
         Scanner sc6 = new Scanner(System.in);
-        String customerFirstName = sc6.next();
-        log.info("Introduce el apellido");
-        Scanner sc7 = new Scanner(System.in);
-        String customerLastName = sc7.next();
-        log.info("Introduce el límite de crédito ");
-        Scanner sc8 = new Scanner(System.in);
-        int creditLimit = sc8.nextInt();
-        log.info("Introduce el email");
-        Scanner sc9 = new Scanner(System.in);
-        String email = sc9.next();
-        log.info("Introduce ID del manager");
-        Scanner sc10 = new Scanner(System.in);
-        int managerID = sc10.nextInt();
-        log.info("Introduce fecha de nacimiento en formato dd/mm/aaaa");
-        Scanner sc11 = new Scanner(System.in);
-        String birthDayString = sc11.next();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date JavaBirthDay = null;
-        try {
-            JavaBirthDay = sdf.parse(birthDayString);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        int option = sc6.nextInt();
+
+        switch (option) {
+
+            case 1:
+                log.info("Introduce el nombre");
+                Scanner sc7 = new Scanner(System.in);
+                customer.setCust_first_name(sc7.next());
+                break;
+
+            case 2:
+                log.info("Introduce el apellido");
+                Scanner sc8 = new Scanner(System.in);
+                customer.setCust_last_name(sc8.next());
+                break;
+
+            case 3:
+                log.info("Introduce el límite de crédito ");
+                Scanner sc9 = new Scanner(System.in);
+                customer.setCredit_limit(sc9.nextInt());
+                break;
+
+            case 4:
+                log.info("Introduce el email");
+                Scanner sc10 = new Scanner(System.in);
+                customer.setCust_email(sc10.next());
+                break;
+
+            case 5:
+                log.info("Introduce ID del manager");
+                Scanner sc11 = new Scanner(System.in);
+                customer.setAccount_mgr_id(sc11.nextInt());
+                break;
+
+            case 6:
+                log.info("Introduce fecha de nacimiento en formato dd/mm/aaaa");
+                Scanner sc12 = new Scanner(System.in);
+                String birthDayString = sc12.next();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                Date JavaBirthDay = null;
+                try {
+                    JavaBirthDay = sdf.parse(birthDayString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                java.sql.Date SqlBirthDay = convert(JavaBirthDay);
+                customer.setDate_of_birth(SqlBirthDay);
+                break;
+
+            case 7:
+                log.info("Introduce estado civil");
+                Scanner sc13 = new Scanner(System.in);
+                customer.setMarital_status(sc13.next());
+                break;
+
+            case 8:
+                log.info("Introduce sexo");
+                Scanner sc14 = new Scanner(System.in);
+                customer.setGender(sc14.next());
+                break;
+
+            case 9:
+                log.info("Introduce nivel de ingresos");
+                Scanner sc15 = new Scanner(System.in);
+                customer.setIncome_level(sc15.next());
+                break;
+
         }
-        java.sql.Date SqlBirthDay = convert(JavaBirthDay);
-        log.info("Introduce estado civil");
-        Scanner sc12 = new Scanner(System.in);
-        String maritalStatus = sc12.next();
-        log.info("Introduce sexo");
-        Scanner sc13 = new Scanner(System.in);
-        String gender = sc13.next();
-        log.info("Introduce nivel de ingresos");
-        Scanner sc14 = new Scanner(System.in);
-        String incomeLevel = sc14.next();
 
         CustomerDaoImpl customerDao = new CustomerDaoImpl();
-        boolean isUpdated = customerDao.updateCustomer(customerId,customerFirstName,customerLastName,creditLimit,email,
-                managerID,SqlBirthDay,maritalStatus,gender,incomeLevel);
+        boolean isUpdated = customerDao.updateCustomer(customer , option);
 
         if(isUpdated) {
-            log.info("Usuario " + customerId + " modificado con éxito");
+            log.info("Usuario " + customer.getCustomer_id() + " modificado con éxito");
         }
-
-
 
     }
 
