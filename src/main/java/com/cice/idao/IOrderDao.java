@@ -6,6 +6,12 @@ import java.sql.SQLException;
 
 public interface IOrderDao {
 
-    public boolean createOrder (Order order, boolean isCreated) throws SQLException;
+    public int createOrder (Order order, boolean isCreated) throws SQLException;
+
+    public boolean finishOrder (Order order) throws SQLException;
+
+    public boolean deleteOrder (Order order) throws SQLException;
+
+
 
 }

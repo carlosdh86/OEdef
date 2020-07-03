@@ -4,6 +4,7 @@ import com.cice.controller.CustomerController;
 import com.cice.dao.CustomerDaoImpl;
 import com.cice.idao.ICustomerDao;
 import com.cice.model.Customer;
+import com.cice.model.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +97,9 @@ public class CustomerView {
     }
 
     public void deleteCustomer() throws SQLException{
+
+        Order order = new Order();
+        boolean isDeleted = false;
 
         log.info("Introduce ID del cliente que quieres borrar");
         Scanner sc4 = new Scanner(System.in);

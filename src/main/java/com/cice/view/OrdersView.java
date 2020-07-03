@@ -1,14 +1,10 @@
 package com.cice.view;
-
 import com.cice.controller.CustomerController;
-import com.cice.dao.CustomerDaoImpl;
 import com.cice.dao.OrderDaoImpl;
-import com.cice.idao.ICustomerDao;
 import com.cice.idao.IOrderDao;
 import com.cice.model.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -62,8 +58,8 @@ public class OrdersView {
                 chooseAction();
 
             case 4:
-                CustomerView customerView3 = new CustomerView();
-                customerView3.deleteCustomer();
+                OrdersView ordersView3 = new OrdersView();
+                ordersView3.deleteOrder();
                 chooseAction();
 
             case 5:
@@ -91,7 +87,7 @@ public class OrdersView {
         int sales_rep_id = sc4.nextInt();
         order.setSales_rep_id(sales_rep_id);
 
-        boolean isStarted=false;
+        boolean isCreated = false;
         boolean isFinished=false;
 
         while(!isFinished) {
@@ -103,11 +99,14 @@ public class OrdersView {
             order.setQuantity(sc6.nextInt());
 
             IOrderDao iOrderDao = new OrderDaoImpl();
-            ICustomerDao iCustomerDao = new CustomerDaoImpl();
-            boolean isCreated = iOrderDao.createOrder(order,isStarted);
-            isStarted=true;
+            iOrderDao.createOrder(order,isCreated);
+
+            if(order.getOrder_id()!=0){
+                isCreated=true;
+            }
+
             if (isCreated) {
-                log.info("Producto añadido al pedido con éxito");
+                log.info("Producto añadido con éxito al pedido nº: "+order.getOrder_id());
 
                 log.info("¿Has acabado ya este pedido?");
                 log.info("1- No, quiero añadir más productos");
@@ -117,11 +116,34 @@ public class OrdersView {
             int option = sc7.nextInt();
             if(option==2){
                 isFinished=true;
+                iOrderDao.finishOrder(order);
+                log.info("Pedido " + order.getOrder_id() + " finalizado con éxito");
             }
 
             }
         }
-
-        log.info("Pedido finalizado con éxito");
     }
+
+    public void deleteOrder() throws SQLException {
+
+        Order order = new Order();
+        boolean isDeleted = false;
+
+        log.info("Introduce ID del pedido que quiere borrar");
+        Scanner sc8 = new Scanner(System.in);
+        order.setOrder_id(sc8.nextInt());
+
+        IOrderDao iOrderDao = new OrderDaoImpl();
+        isDeleted = iOrderDao.deleteOrder(order);
+        System.out.println(isDeleted);
+
+        if (!isDeleted) {
+            log.info("No existe el pedido que quiere borrar");
+        }else{
+            log.info("Pedido "+ order.getOrder_id() + " borrado con éxito");
+        }
+
+        chooseAction();
+    }
+
 }
