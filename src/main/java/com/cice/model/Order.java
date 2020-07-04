@@ -130,4 +130,22 @@ public class Order {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "order_id=" + order_id +
+                ", order_date=" + order_date +
+                ", order_mode='" + order_mode + '\'' +
+                ", customer_id=" + customer_id +
+                ", order_status=" + order_status +
+                ", order_total=" + order_total +
+                ", sales_rep_id=" + sales_rep_id +
+                ", promotion_id=" + promotion_id +
+                ", line_item_id=" + line_item_id +
+                ", product_id=" + product_id +
+                ", unit_price=" + unit_price +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

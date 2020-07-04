@@ -6,9 +6,7 @@ import com.cice.model.Customer;
 import com.cice.view.CustomerView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerController {
@@ -23,15 +21,14 @@ public class CustomerController {
     }
     
     public void getCustomers() {
-        List<Customer> customers = new ArrayList<Customer>();
+
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
-        customers = iCustomerDao.getCustomers();
+        List<Customer> customers = iCustomerDao.getCustomers();
     }
 
     public void getCustomersByLastName(String lastName){
-        List<Customer> customers = new ArrayList<Customer>();
         ICustomerDao iCustomerDao = new CustomerDaoImpl();
-        customers = iCustomerDao.getCustomerById(lastName);
+        List<Customer> customers = iCustomerDao.getCustomerById(lastName);
         if(customers.size()==0) {
             log.warn("No existe ningún cliente con ese apellido");
         }

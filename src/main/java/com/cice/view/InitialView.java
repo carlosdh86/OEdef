@@ -1,6 +1,5 @@
 package com.cice.view;
 
-import com.cice.Main;
 import com.cice.connection.MyConnection;
 import com.cice.controller.ConnectionController;
 import com.cice.controller.CustomerController;
@@ -27,7 +26,8 @@ public class InitialView {
         int option = sc.nextInt();
         CustomerController customerController = new CustomerController();
         CustomerView customerView = new CustomerView();
-        OrdersView ordersView = new OrdersView();
+        OrderView orderView = new OrderView();
+        ProductView productView = new ProductView();
 
         switch (option) {
             case 1:
@@ -35,10 +35,11 @@ public class InitialView {
                 break;
 
             case 2:
-                ordersView.chooseAction();
+                orderView.chooseAction();
                 break;
 
             case 3:
+                productView.chooseAction();
                 break;
 
             case 4:

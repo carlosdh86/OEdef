@@ -2,11 +2,14 @@ package com.cice.dao;
 
 import com.cice.connection.MyConnection;
 import com.cice.idao.IOrderDao;
+import com.cice.model.Customer;
 import com.cice.model.Order;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderDaoImpl implements IOrderDao {
 
@@ -21,11 +24,75 @@ public class OrderDaoImpl implements IOrderDao {
     public static PreparedStatement stm8 = null;
     public static PreparedStatement stm9 = null;
     public static PreparedStatement stm10 = null;
+    public static PreparedStatement stm11 = null;
+    public static PreparedStatement stm12 = null;
+    public static PreparedStatement stm13 = null;
+    public static PreparedStatement stm14 = null;
     public static ResultSet rs2 = null;
     public static ResultSet rs4 = null;
     public static ResultSet rs5 = null;
     public static ResultSet rs6 = null;
     public static ResultSet rs7 = null;
+    public static ResultSet rs11 = null;
+    public static ResultSet rs12 = null;
+    public static ResultSet rs13 = null;
+    public static ResultSet rs14 = null;
+
+    public List<Order> getOrders() throws SQLException {
+        List<Order> orderList = new ArrayList<Order>();
+
+        try {
+            stm11 = myconnection.prepareStatement("SELECT * FROM ORDERS ORDER BY 1");
+            rs11 = stm11.executeQuery();
+            while (rs11.next()) {
+                Order order = new Order();
+                order.setOrder_id(rs11.getInt(1));
+                order.setOrder_date(rs11.getDate(2));
+                order.setOrder_mode(rs11.getString(3));
+                order.setCustomer_id(rs11.getInt(4));
+                order.setOrder_status(rs11.getInt(5));
+                order.setOrder_total(rs11.getFloat(6));
+                order.setSales_rep_id(rs11.getInt(7));
+                order.setProduct_id(rs11.getInt(8));
+
+                System.out.println(order);
+                orderList.add(order);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orderList;
+    }
+
+    public List<Order> getOrderById(int orderId) throws SQLException {
+        List<Order> orderList = new ArrayList<Order>();
+
+        try {
+            stm12 = myconnection.prepareStatement("SELECT * FROM ORDERS WHERE ORDER_ID=?");
+            stm12.setInt(1, orderId);
+            rs12 = stm12.executeQuery();
+            while (rs12.next()) {
+                Order order = new Order();
+                order.setOrder_id(rs12.getInt(1));
+                order.setOrder_date(rs12.getDate(2));
+                order.setOrder_mode(rs12.getString(3));
+                order.setCustomer_id(rs12.getInt(4));
+                order.setOrder_status(rs12.getInt(5));
+                order.setOrder_total(rs12.getFloat(6));
+                order.setSales_rep_id(rs12.getInt(7));
+                order.setProduct_id(rs12.getInt(8));
+
+                System.out.println(order);
+                orderList.add(order);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orderList;
+    }
 
     public int createOrder(Order order, boolean isCreated) throws SQLException {
 
@@ -130,6 +197,24 @@ public class OrderDaoImpl implements IOrderDao {
             if (stm10.executeUpdate()!=0) {
                 return true;
             } else return false;
+    }
+
+    public List<Double> getOrderTotal() throws SQLException {
+        List <Double> response =  new ArrayList<Double>();
+        stm13 = myconnection.prepareStatement("SELECT COUNT (ORDER_ID) FROM ORDERS");
+        rs13 = stm13.executeQuery();
+        if (rs13.next()) {
+           double ordersCount = rs13.getDouble(1);
+           response.add(ordersCount);
+        }
+
+        stm14 = myconnection.prepareStatement("SELECT SUM(ORDER_TOTAL) FROM ORDERS");
+        rs14 = stm14.executeQuery();
+        if (rs14.next()) {
+            double ordersTotal = rs14.getDouble(1);
+            response.add(ordersTotal);
+        }
+        return response;
     }
 }
 

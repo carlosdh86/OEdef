@@ -1,16 +1,17 @@
 package com.cice.view;
-import com.cice.controller.CustomerController;
+import com.cice.controller.OrderController;
 import com.cice.dao.OrderDaoImpl;
 import com.cice.idao.IOrderDao;
 import com.cice.model.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
-public class OrdersView {
+public class OrderView {
 
-    private static final Logger log = LoggerFactory.getLogger(OrdersView.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderView.class);
 
     public static void chooseAction () throws SQLException {
         log.info("Elige la acción que quieres realizar sobre pedidos");
@@ -18,52 +19,69 @@ public class OrdersView {
         log.info("-2:Consultar pedido");
         log.info("-3:Modificar pedido");
         log.info("-4:Borrar pedido");
-        log.info("-5:Volver al menú principal");
+        log.info("-5:Pedidos totales con facturación");
+        log.info("-6:Volver al menú principal");
         Scanner sc = new Scanner(System.in);
         int option = sc.nextInt();
 
         switch (option) {
 
             case 1:
-                OrdersView ordersView = new OrdersView();
+                OrderView orderView = new OrderView();
                 try {
-                    ordersView.createOrder();
+                    orderView.createOrder();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
                 chooseAction();
 
             case 2:
-                CustomerController customerController = new CustomerController();
+                OrderController orderController = new OrderController();
                 log.info("¿Qué pedidos quieres consultar?");
                 log.info("1-:Todos");
-                log.info("2-:Filtrar por apellido");
+                log.info("2-:Filtrar por ID");
                 Scanner sc2 = new Scanner(System.in);
                 int option2 = sc2.nextInt();
                 switch (option2) {
                     case 1:
-                        customerController.getCustomers();
+                        orderController.getOrders();
                         chooseAction();
                     case 2:
-                        log.info("Introduce el apellido");
+                        log.info("Introduce el ID de pedido");
                         Scanner sc3 = new Scanner(System.in);
-                        String lastName = sc3.next();
-                        customerController.getCustomersByLastName(lastName);
+                        int orderId = sc3.nextInt();
+                        orderController.getOrderById(orderId);
                         chooseAction();
                 }
 
             case 3:
-                CustomerView customerView2 = new CustomerView();
-                customerView2.updateCustomer();
+
+                Order order = new Order();
+
+                log.info("Introduce ID del pedido que quieres modificar");
+
+
+
+
+                OrderController orderController2 = new OrderController();
+                OrderView orderView5 = new OrderView();
+                orderView5.
                 chooseAction();
 
             case 4:
-                OrdersView ordersView3 = new OrdersView();
-                ordersView3.deleteOrder();
+                OrderView orderView4 = new OrderView();
+                orderView4.deleteOrder();
                 chooseAction();
 
             case 5:
+                OrderController orderController5 = new OrderController();
+                log.info("El número total de pedidos es: " + new DecimalFormat("#").format(orderController5.getOrderTotal().get(0)));
+                log.info("El importe total de facturación es: " + orderController5.getOrderTotal().get(1) + " €");
+
+
+            case 6:
                 InitialView.appStart();
+
         }
 
     }
