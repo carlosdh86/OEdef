@@ -1,5 +1,6 @@
 package com.cice.view;
 import com.cice.controller.OrderController;
+import com.cice.dao.CustomerDaoImpl;
 import com.cice.dao.OrderDaoImpl;
 import com.cice.idao.IOrderDao;
 import com.cice.model.Order;
@@ -7,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class OrderView {
@@ -57,16 +61,63 @@ public class OrderView {
             case 3:
 
                 Order order = new Order();
-
                 log.info("Introduce ID del pedido que quieres modificar");
+                Scanner sc9 = new Scanner(System.in);
+                order.setOrder_id(sc9.nextInt());
 
+                log.info("Elige el dato que quieres modificar sobre el pedido nº " + order.getOrder_id());
+                log.info("-1: Modo del pedido (En tienda, por teléfono o por email)");
+                log.info("-2: ID del cliente");
+                log.info("-3: ID de empleado");
+                log.info("-4: ID de promoción");
+                log.info("-5: Añadir producto al pedido");
+                log.info("-6: Quitar producto del pedido");
 
+                Scanner sc10 = new Scanner(System.in);
+                int option3 = sc10.nextInt();
 
+                switch (option3) {
 
-                OrderController orderController2 = new OrderController();
-                OrderView orderView5 = new OrderView();
-                orderView5.
-                chooseAction();
+                    case 1:
+                        log.info("Introduce el nuevo modo de pedido");
+                        Scanner sc11 = new Scanner(System.in);
+                        order.setOrder_mode(sc11.next());
+                        break;
+
+                    case 2:
+                        log.info("Introduce el nuevo ID de cliente");
+                        Scanner sc12 = new Scanner(System.in);
+                        order.setCustomer_id(sc12.nextInt());
+                        break;
+
+                    case 3:
+                        log.info("Introduce el nuevo ID de empleado");
+                        Scanner sc13 = new Scanner(System.in);
+                        order.setSales_rep_id(sc13.nextInt());
+                        break;
+
+                    case 4:
+                        log.info("Introduce el nuevo ID de promoción");
+                        Scanner sc14 = new Scanner(System.in);
+                        order.setPromotion_id(sc14.nextInt());
+                        break;
+
+                    case 5:
+                        log.info("Introduce ID del producto");
+                        Scanner sc15 = new Scanner(System.in);
+                        order.setProduct_id(sc15.nextInt());
+                        log.info("Introduce cantidad del producto");
+                        Scanner sc16 = new Scanner(System.in);
+                        order.setProduct_id(sc16.nextInt());
+                }
+
+                OrderDaoImpl orderDao = new OrderDaoImpl();
+                boolean isUpdated = orderDao.updateOrder (order,option3);
+
+                    if(isUpdated) {
+                      log.info("Pedido " + order.getOrder_id() + " modificado con éxito");
+                    }
+                    chooseAction();
 
             case 4:
                 OrderView orderView4 = new OrderView();

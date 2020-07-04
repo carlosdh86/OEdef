@@ -1,8 +1,6 @@
 package com.cice.idao;
 
-import com.cice.model.Customer;
 import com.cice.model.Order;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -20,8 +18,8 @@ public interface IOrderDao {
 
     public List<Double> getOrderTotal () throws SQLException;
 
+    public void updateOrderTotal (int orderId) throws SQLException;
 
-
-    //public boolean updateOrder (Order order, int field) throws SQLException;
+    public boolean updateOrder (Order order, int field) throws SQLException;
 
 }
