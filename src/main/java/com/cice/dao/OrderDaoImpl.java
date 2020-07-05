@@ -4,6 +4,8 @@ import com.cice.connection.MyConnection;
 import com.cice.idao.IOrderDao;
 import com.cice.model.Customer;
 import com.cice.model.Order;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +31,10 @@ public class OrderDaoImpl implements IOrderDao {
     public static PreparedStatement stm13 = null;
     public static PreparedStatement stm14 = null;
     public static PreparedStatement stm15 = null;
+    public static PreparedStatement stm16 = null;
+    public static PreparedStatement stm17 = null;
+    public static PreparedStatement stm18 = null;
+    public static PreparedStatement stm19 = null;
     public static ResultSet rs2 = null;
     public static ResultSet rs4 = null;
     public static ResultSet rs5 = null;
@@ -40,6 +46,9 @@ public class OrderDaoImpl implements IOrderDao {
     public static ResultSet rs14 = null;
     public static ResultSet rs15 = null;
     public static ResultSet rs16 = null;
+    public static ResultSet rs18 = null;
+    public static ResultSet rs19 = null;
+
 
     public List<Order> getOrders() throws SQLException {
         List<Order> orderList = new ArrayList<Order>();
@@ -184,18 +193,24 @@ public class OrderDaoImpl implements IOrderDao {
 
     public void updateOrderTotal(int orderId) throws SQLException {
 
-
-        stm15 = myconnection.prepareStatement("SELECT UNIT_PRICE , QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=?");
+        stm15 = myconnection.prepareStatement("SELECT UNIT_PRICE,QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=?");
         stm15.setInt(1, orderId);
-        rs15 = stm5.executeQuery();
+        rs15 = stm15.executeQuery();
+        double rowOrderTotal;
+        double orderTotal = 0;
+
         while (rs15.next()) {
             double unitPrice = rs15.getDouble(1);
             int quantity = rs15.getInt(2);
-            double orderTotalBefore = unitPrice * quantity;
-            double orderTotalAfter = orderTotalBefore + unitPrice * quantity;
+            rowOrderTotal = unitPrice * quantity;
+            orderTotal = orderTotal + rowOrderTotal ;
+
         }
 
-
+        stm16 = myconnection.prepareStatement("UPDATE ORDERS SET ORDER_TOTAL=? WHERE ORDER_ID=?");
+        stm16.setDouble(1,orderTotal);
+        stm16.setInt(2,orderId);
+        stm16.execute();
     }
 
     public boolean finishOrder(Order order) throws SQLException {
@@ -248,55 +263,124 @@ public class OrderDaoImpl implements IOrderDao {
                     stm = myconnection.prepareStatement(" UPDATE ORDERS SET ORDER_MODE=? WHERE ORDER_ID=? ");
                     stm.setString(1, order.getOrder_mode());
                     stm.setInt(2, order.getOrder_id());
+                    rs16 = stm.executeQuery();
                     break;
 
                 case 2:
                     stm = myconnection.prepareStatement(" UPDATE ORDERS SET CUSTOMER_ID=? WHERE ORDER_ID=? ");
                     stm.setInt(1, order.getCustomer_id());
                     stm.setInt(2, order.getOrder_id());
+                    rs16 = stm.executeQuery();
                     break;
 
                 case 3:
                     stm = myconnection.prepareStatement(" UPDATE ORDERS SET SALES_REP_ID=? WHERE ORDER_ID=? ");
                     stm.setInt(1, order.getSales_rep_id());
                     stm.setInt(2, order.getOrder_id());
+                    rs16 = stm.executeQuery();
                     break;
 
                 case 4:
                     stm = myconnection.prepareStatement(" UPDATE ORDERS SET PROMOTION_ID=? WHERE ORDER_ID=? ");
                     stm.setInt(1, order.getPromotion_id());
                     stm.setInt(2, order.getOrder_id());
+                    rs16 = stm.executeQuery();
                     break;
 
                 case 5:
-
-                    /*stm = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,UNIT_PRICE,QUANTITY) VALUES ( ? , ? , ? , ? , ?)");
-                    stm.setInt(1, order.getOrder_id());
-                    stm.setInt(2, line_item_id);
-                    stm.setInt(3, order.getProduct_id());
-                    stm.setFloat(4, unitPrice);
-                    stm.setInt(5, order.getQuantity());
-                    stm.execute();*/
-
+                    isUpdated = addProductToOrder(order);
                     break;
 
                 case 6:
-
+                    isUpdated = deleteProductFromOrder(order);
                     break;
             }
 
 
+                if (rs16 != null) {
+                    isUpdated = true;
+                }
 
-            rs16 = stm.executeQuery();
-            if(rs16!=null) {
-                isUpdated = true;
-            }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return isUpdated;
+
+    }
+
+    public boolean addProductToOrder (Order order) throws SQLException {
+
+        try {
+
+            stm18 = myconnection.prepareStatement("SELECT PRODUCT_ID,QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=?");
+            stm18.setInt(1,order.getOrder_id());
+            stm18.setInt(2,order.getProduct_id());
+            rs18 = stm18.executeQuery();
+            if(rs18.next()) {
+                int oldQuantity = rs18.getInt(2);
+                int newQuantity = oldQuantity + order.getQuantity();
+                stm19 = myconnection.prepareStatement("UPDATE ORDER_ITEMS SET QUANTITY=? WHERE ORDER_ID=? AND PRODUCT_ID=?");
+                stm19.setInt(1,newQuantity);
+                stm19.setInt(2,order.getOrder_id());
+                stm19.setInt(3,order.getProduct_id());
+                stm19.execute();
+
+            }else {
+                stm5 = myconnection.prepareStatement("SELECT LIST_PRICE FROM PRODUCT_INFORMATION WHERE PRODUCT_ID=?");
+                stm5.setInt(1, order.getProduct_id());
+                rs5 = stm5.executeQuery();
+                float unitPrice = 0;
+                if (rs5.next()) {
+                    unitPrice = (rs5.getFloat(1));
+                    System.out.println("El precio del producto es: " + unitPrice + " €");
+                }
+
+                stm4 = myconnection.prepareStatement("SELECT LINE_ITEM_ID FROM ORDER_ITEMS WHERE ORDER_ID = ? AND rownum <= 1 ORDER BY LINE_ITEM_ID DESC");
+                stm4.setInt(1, order.getOrder_id());
+                rs4 = stm4.executeQuery();
+                if (rs4.next()) {
+                    int line_item_id = (rs4.getInt(1));
+                    line_item_id = line_item_id + 1;
+
+                    stm3 = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,UNIT_PRICE,QUANTITY) VALUES ( ? , ? , ? , ? , ?)");
+                    stm3.setInt(1, order.getOrder_id());
+                    stm3.setInt(2, line_item_id);
+                    stm3.setInt(3, order.getProduct_id());
+                    stm3.setFloat(4, unitPrice);
+                    stm3.setInt(5, order.getQuantity());
+                    System.out.println(order.getOrder_id());
+                    System.out.println(line_item_id);
+                    System.out.println(order.getProduct_id());
+
+                    stm3.execute();
+                }
+            }
+
+            updateOrderTotal(order.getOrder_id());
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public boolean deleteProductFromOrder(Order order) throws SQLException {
+
+        try {
+            stm17 = myconnection.prepareStatement("DELETE FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=? ");
+            stm17.setInt(1,order.getOrder_id());
+            stm17.setInt(2,order.getProduct_id());
+            stm17.execute();
+            updateOrderTotal(order.getOrder_id());
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
 
     }
 }

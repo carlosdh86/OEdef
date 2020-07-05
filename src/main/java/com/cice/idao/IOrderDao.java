@@ -22,4 +22,10 @@ public interface IOrderDao {
 
     public boolean updateOrder (Order order, int field) throws SQLException;
 
+    public boolean addProductToOrder (Order order ) throws SQLException;
+
+    public boolean deleteProductFromOrder (Order order ) throws SQLException;
+
+
+
 }

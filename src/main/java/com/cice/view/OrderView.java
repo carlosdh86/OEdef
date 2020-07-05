@@ -108,11 +108,20 @@ public class OrderView {
                         order.setProduct_id(sc15.nextInt());
                         log.info("Introduce cantidad del producto");
                         Scanner sc16 = new Scanner(System.in);
-                        order.setProduct_id(sc16.nextInt());
+                        order.setQuantity(sc16.nextInt());
+                        break;
+
+                    case 6:
+                        log.info("Introduce ID del producto");
+                        Scanner sc17 = new Scanner(System.in);
+                        order.setProduct_id(sc17.nextInt());
+                        break;
+
                 }
 
                 OrderDaoImpl orderDao = new OrderDaoImpl();
                 boolean isUpdated = orderDao.updateOrder (order,option3);
+                System.out.println(isUpdated);
 
                     if(isUpdated) {
                       log.info("Pedido " + order.getOrder_id() + " modificado con éxito");
