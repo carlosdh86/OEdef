@@ -8,7 +8,7 @@ public interface IOrderDao {
 
     public List<Order> getOrders() throws SQLException;
 
-    public List<Order> getOrderById (int orderId) throws SQLException;
+    public Order getOrderById (int orderId) throws SQLException;
 
     public int createOrder (Order order, boolean isCreated) throws SQLException;
 
@@ -18,7 +18,7 @@ public interface IOrderDao {
 
     public List<Double> getOrderTotal () throws SQLException;
 
-    public void updateOrderTotal (int orderId) throws SQLException;
+    public double updateOrderTotal (int orderId) throws SQLException;
 
     public boolean updateOrder (Order order, int field) throws SQLException;
 

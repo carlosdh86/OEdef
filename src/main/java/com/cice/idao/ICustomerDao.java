@@ -10,4 +10,5 @@ public interface ICustomerDao {
     public List<Customer> getCustomerById (String lastName);
     public boolean updateCustomer(Customer customer, int field) throws SQLException;
     public boolean deleteCustomer(int customerID);
+
 }

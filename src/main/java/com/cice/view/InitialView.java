@@ -17,7 +17,7 @@ public class InitialView {
 
         ConnectionController.control();
 
-        log.info("Bienvenido " + ConnectionView.getUser() + ". Has iniciado sesión con éxito. Ahora elige los datos que quieres modificar:");
+        log.info("Bienvenido " + ConnectionView.getUser() + ". Has iniciado sesión con éxito. Elige una opción:");
         log.info("-1:Clientes");
         log.info("-2:Pedidos");
         log.info("-3:Productos");

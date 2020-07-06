@@ -1,47 +1,52 @@
 package com.cice.controller;
 
-import com.cice.dao.CustomerDaoImpl;
 import com.cice.dao.OrderDaoImpl;
-import com.cice.idao.ICustomerDao;
 import com.cice.idao.IOrderDao;
-import com.cice.model.Customer;
 import com.cice.model.Order;
-import com.cice.view.CustomerView;
 import com.cice.view.OrderView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class OrderController {
 
+
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+    OrderDaoImpl orderDao = new OrderDaoImpl();
 
-    private OrderView orderView = new OrderView();
-
-
-    public void getOrders() throws SQLException {
-
+    public List<Order> getOrders() throws SQLException {
         IOrderDao iOrderDao = new OrderDaoImpl();
-        List<Order> orders = iOrderDao.getOrders();
+        return iOrderDao.getOrders();
     }
 
-    public void getOrderById(int orderId) throws SQLException {
-        IOrderDao iOrderDao = new OrderDaoImpl();
-        List<Order> orders = iOrderDao.getOrderById(orderId);
-        if(orders.size()==0) {
-            log.warn("No existe ningún pedido con ese ID");
-        }
+    public Order getOrderById(int orderId) throws SQLException {
+        return orderDao.getOrderById(orderId);
     }
 
     public List<Double> getOrderTotal() throws SQLException {
-        IOrderDao iOrderDao = new OrderDaoImpl();
-        List<Double>response = iOrderDao.getOrderTotal();
+        List<Double> response = orderDao.getOrderTotal();
         return response;
     }
 
+    public boolean updateOrder(Order order,int field) throws SQLException {
+        return orderDao.updateOrder(order,field);
+    }
 
+    public boolean deleteOrder (Order order) throws SQLException {
+        return orderDao.deleteOrder(order);
+    }
 
+    public int createOrder (Order order, boolean isCreated) throws SQLException {
+        return orderDao.createOrder(order,isCreated);
+
+    }
+
+    public boolean finishOrder (Order order) throws SQLException {
+        //System.out.println("El importe del pedido es " + orderDao.updateOrderTotal(order.getOrder_id()) + " €");
+        System.out.println("El importe del pedido es " + new DecimalFormat("#.##").format(orderDao.updateOrderTotal(order.getOrder_id())) + " €");
+        return orderDao.finishOrder(order);
+
+    }
 }
