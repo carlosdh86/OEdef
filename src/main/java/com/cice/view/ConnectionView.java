@@ -1,12 +1,7 @@
 package com.cice.view;
 
-import com.cice.Main;
-import com.cice.connection.MyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class ConnectionView {
@@ -22,9 +17,12 @@ public class ConnectionView {
         log.info("Introduce tu usuario de la Base de Datos Oracle");
         Scanner sc = new Scanner(System.in);
         user = sc.next();
+
         log.info("Introduce tu contraseña de la Base de Datos Oracle");
-        pass = sc.next();
+        Scanner sc2 = new Scanner(System.in);
+        pass = sc2.next();
     }
+
 
     public static String getUser() {
         return user;

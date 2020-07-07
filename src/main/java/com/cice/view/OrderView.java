@@ -13,6 +13,7 @@ public class OrderView {
     private static final Logger log = LoggerFactory.getLogger(OrderView.class);
 
     public static void chooseAction () throws SQLException {
+
         log.info("Elige la acción que quieres realizar sobre pedidos");
         log.info("-1:Realizar pedido");
         log.info("-2:Consultar pedido");
@@ -20,6 +21,7 @@ public class OrderView {
         log.info("-4:Eliminar pedido");
         log.info("-5:Pedidos totales con facturación");
         log.info("-6:Volver al menú principal");
+
         Scanner sc1 = new Scanner(System.in);
         int option = sc1.nextInt();
 
@@ -59,7 +61,6 @@ public class OrderView {
                     }
 
                     if (isCreated) {
-                        log.info("Producto añadido con éxito al pedido nº: " + order.getOrder_id());
                         log.info("¿Has acabado ya este pedido?");
                         log.info("1- No, quiero añadir más productos");
                         log.info("2- Sí, quiero finalizar este pedido");
@@ -67,9 +68,7 @@ public class OrderView {
                         Scanner sc7 = new Scanner(System.in);
                         int option2 = sc7.nextInt();
                         if (option2 == 2) {
-                            isFinished = true;
-                            orderController.finishOrder(order);
-                            log.info("Pedido " + order.getOrder_id() + " finalizado con éxito");
+                            isFinished = orderController.finishOrder(order);
                         }
                     }
                 }
@@ -107,8 +106,8 @@ public class OrderView {
                 log.info("-2: ID del cliente");
                 log.info("-3: ID de empleado");
                 log.info("-4: ID de promoción");
-                log.info("-5: Añadir producto al pedido");
-                log.info("-6: Quitar producto del pedido");
+                log.info("-5: Añadir producto a un pedido");
+                log.info("-6: Quitar producto de un pedido");
                 Scanner sc11 = new Scanner(System.in);
                 int option3 = sc11.nextInt();
 
@@ -146,16 +145,19 @@ public class OrderView {
                         Scanner sc18 = new Scanner(System.in);
                         order3.setProduct_id(sc18.nextInt());
                         break;
+
                     default:
                         log.warn("Opción incorrecta");
+                        chooseAction();
                 }
 
                 OrderController orderController2 = new OrderController();
                 boolean isUpdated = orderController2.updateOrder(order3,option3);
 
-                if(isUpdated) {
-                      log.info("Pedido " + order3.getOrder_id() + " modificado con éxito");
-                }
+                if (!isUpdated) {
+                    log.error("Se ha producido un error y el pedido no ha podido ser modificado. Compruebe los datos.");
+                }else log.info("Pedido " + order3.getOrder_id() + " modificado con éxito.");
+
                 chooseAction();
 
             case 4:
@@ -168,17 +170,14 @@ public class OrderView {
 
                 if (!isDeleted) {
                     log.info("No existe el pedido que quiere eliminar");
-                }else{
-                    log.info("Pedido "+ order2.getOrder_id() + " eliminado con éxito");
-                }
+                }else log.info("Pedido "+ order2.getOrder_id() + " eliminado con éxito");
 
                 chooseAction();
 
             case 5:
-                OrderController orderController5 = new OrderController();
-                log.info("El número total de pedidos es: " + new DecimalFormat("#").format(orderController5.getOrderTotal().get(0)));
-                log.info("El importe total de facturación es: " + orderController5.getOrderTotal().get(1) + " €");
-
+                OrderController orderController4 = new OrderController();
+                log.info("El número total de pedidos es: " + new DecimalFormat("#").format(orderController4.getOrderTotal().get(0)));
+                log.info("El importe total de facturación es: " + orderController4.getOrderTotal().get(1) + " €");
 
             case 6:
                 InitialView.appStart();
@@ -190,6 +189,6 @@ public class OrderView {
         }
     }
 
-   }
+}
 
 

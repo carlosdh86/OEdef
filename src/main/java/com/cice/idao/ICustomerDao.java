@@ -5,10 +5,15 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ICustomerDao {
+
     public boolean createCustomer (Customer customer) throws SQLException;
-    public List<Customer> getCustomers();
-    public List<Customer> getCustomerById (String lastName);
+
+    public List<Customer> getCustomers() throws SQLException;
+
+    public List<Customer> getCustomerById (String lastName) throws SQLException;
+
     public boolean updateCustomer(Customer customer, int field) throws SQLException;
-    public boolean deleteCustomer(int customerID);
+
+    public boolean deleteCustomer(int customerID) throws SQLException;
 
 }

@@ -19,22 +19,22 @@ public class CustomerDaoImpl implements ICustomerDao {
         boolean isCreated = false;
 
         try {
-            stm = myconnection.prepareStatement("INSERT INTO CUSTOMERS (CUSTOMER_ID , CUST_FIRST_NAME , CUST_LAST_NAME) VALUES (NULL,?,?)");
+            stm = myconnection.prepareStatement("INSERT INTO CUSTOMERS (CUSTOMER_ID,CUST_FIRST_NAME,CUST_LAST_NAME,CUST_EMAIL) VALUES (NULL,?,?,?)");
             stm.setString(1, customer.getCust_first_name());
             stm.setString(2, customer.getCust_last_name());
-
-            stm.execute();
-
-            isCreated = true;
+            stm.setString(3, customer.getCust_email());
+            if (stm.executeUpdate()!=0) {
+                isCreated = true;
+                return isCreated;
+            } else return isCreated;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return isCreated;
         }
-        return isCreated;
     }
 
-
-    public List<Customer> getCustomers() {
+    public List<Customer> getCustomers() throws SQLException {
 
         List<Customer> customerList = new ArrayList<Customer>();
 
@@ -58,6 +58,7 @@ public class CustomerDaoImpl implements ICustomerDao {
                 System.out.println(customer);
                 customerList.add(customer);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -65,7 +66,7 @@ public class CustomerDaoImpl implements ICustomerDao {
         return customerList;
     }
 
-    public List<Customer> getCustomerById(String lastName) {
+    public List<Customer> getCustomerById(String lastName) throws SQLException {
 
         List<Customer> customerList = new ArrayList<Customer>();
 
@@ -137,7 +138,8 @@ public class CustomerDaoImpl implements ICustomerDao {
 
                 case 6:
                     stm = myconnection.prepareStatement(" UPDATE CUSTOMERS SET DATE_OF_BIRTH=? WHERE CUSTOMER_ID=? ");
-                    stm.setDate(1, customer.getDate_of_birth());
+                    java.sql.Date sqlBirthday = convertJavaDateToSqlDate(customer.getDate_of_birth());
+                    stm.setDate(1, sqlBirthday);
                     stm.setInt(2, customer.getCustomer_id());
                     break;
 
@@ -175,15 +177,24 @@ public class CustomerDaoImpl implements ICustomerDao {
 
     public boolean deleteCustomer(int customerID) {
 
-        boolean isDeleted=false;
-
         try {
-            stm = myconnection.prepareStatement("DELETE FROM CUSTOMERS WHERE CUSTOMER_ID=?");stm.setInt(1, customerID);
-            rs = stm.executeQuery();
-            isDeleted=true;
+            stm = myconnection.prepareStatement("DELETE FROM CUSTOMERS WHERE CUSTOMER_ID=?");
+            stm.setInt(1, customerID);
+
+            if (stm.executeUpdate()!=0) {
+                return true;
+            } else return false;
+
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return isDeleted;
     }
+
+    private static java.sql.Date convertJavaDateToSqlDate(java.util.Date date) {
+
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        return sqlDate;
+    }
+
 }

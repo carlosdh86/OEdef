@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,60 +23,6 @@ public class OrderDaoImpl implements IOrderDao {
     public static ResultSet rs2 = null;
     public static ResultSet rs3 = null;
     public static ResultSet rs4 = null;
-
-
-    public List<Order> getOrders() throws SQLException {
-
-        List<Order> orderList = new ArrayList<Order>();
-
-        try {
-            stm1 = myconnection.prepareStatement("SELECT * FROM ORDERS ORDER BY 1");
-            rs1 = stm1.executeQuery();
-            while (rs1.next()) {
-                Order order = new Order();
-                order.setOrder_id(rs1.getInt(1));
-                order.setOrder_date(rs1.getDate(2));
-                order.setOrder_mode(rs1.getString(3));
-                order.setCustomer_id(rs1.getInt(4));
-                order.setOrder_status(rs1.getInt(5));
-                order.setOrder_total(rs1.getFloat(6));
-                order.setSales_rep_id(rs1.getInt(7));
-                order.setProduct_id(rs1.getInt(8));
-                orderList.add(order);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return orderList;
-    }
-
-    public Order getOrderById(int orderId) throws SQLException {
-        Order order = new Order();
-
-        try {
-            stm1 = myconnection.prepareStatement("SELECT * FROM ORDERS WHERE ORDER_ID=?");
-            stm1.setInt(1, orderId);
-            rs1 = stm1.executeQuery();
-            if (rs1.next()) {
-
-                order.setOrder_id(rs1.getInt(1));
-                order.setOrder_date(rs1.getDate(2));
-                order.setOrder_mode(rs1.getString(3));
-                order.setCustomer_id(rs1.getInt(4));
-                order.setOrder_status(rs1.getInt(5));
-                order.setOrder_total(rs1.getFloat(6));
-                order.setSales_rep_id(rs1.getInt(7));
-                order.setProduct_id(rs1.getInt(8));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return order;
-    }
 
     public int createOrder(Order order, boolean isCreated) throws SQLException {
 
@@ -156,6 +103,7 @@ public class OrderDaoImpl implements IOrderDao {
             }
 
             updateOrderTotal(order.getOrder_id());
+            System.out.println("Producto " + order.getProduct_id() + " añadido con éxito al pedido "+ order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
             return true;
 
         } catch (SQLException e) {
@@ -164,6 +112,129 @@ public class OrderDaoImpl implements IOrderDao {
         }
     }
 
+    public boolean deleteProductFromOrder(Order order) throws SQLException {
+
+        try {
+            stm1 = myconnection.prepareStatement("DELETE FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=? ");
+            stm1.setInt(1, order.getOrder_id());
+            stm1.setInt(2, order.getProduct_id());
+
+            if (stm1.executeUpdate()!=0) {
+                updateOrderTotal(order.getOrder_id());
+                System.out.println("Producto " + order.getProduct_id() + " eliminado con éxito del pedido "+ order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
+                return true;
+            } else return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Order> getOrders() throws SQLException {
+
+        List<Order> orderList = new ArrayList<Order>();
+
+        try {
+            stm1 = myconnection.prepareStatement("SELECT * FROM ORDERS ORDER BY 1");
+            rs1 = stm1.executeQuery();
+            while (rs1.next()) {
+                Order order = new Order();
+                order.setOrder_id(rs1.getInt(1));
+                order.setOrder_date(rs1.getDate(2));
+                order.setOrder_mode(rs1.getString(3));
+                order.setCustomer_id(rs1.getInt(4));
+                order.setOrder_status(rs1.getInt(5));
+                order.setOrder_total(rs1.getFloat(6));
+                order.setSales_rep_id(rs1.getInt(7));
+                order.setProduct_id(rs1.getInt(8));
+                orderList.add(order);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orderList;
+    }
+
+    public Order getOrderById(int orderId) throws SQLException {
+        Order order = new Order();
+
+        try {
+            stm1 = myconnection.prepareStatement("SELECT * FROM ORDERS WHERE ORDER_ID=?");
+            stm1.setInt(1, orderId);
+            rs1 = stm1.executeQuery();
+            if (rs1.next()) {
+
+                order.setOrder_id(rs1.getInt(1));
+                order.setOrder_date(rs1.getDate(2));
+                order.setOrder_mode(rs1.getString(3));
+                order.setCustomer_id(rs1.getInt(4));
+                order.setOrder_status(rs1.getInt(5));
+                order.setOrder_total(rs1.getFloat(6));
+                order.setSales_rep_id(rs1.getInt(7));
+                order.setProduct_id(rs1.getInt(8));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return order;
+    }
+
+    public boolean updateOrder(Order order, int field) throws SQLException {
+
+        boolean isUpdated = false;
+
+        try {
+
+            switch (field) {
+                case 1:
+                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET ORDER_MODE=? WHERE ORDER_ID=? ");
+                    stm1.setString(1, order.getOrder_mode());
+                    stm1.setInt(2, order.getOrder_id());
+                    break;
+
+                case 2:
+                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET CUSTOMER_ID=? WHERE ORDER_ID=? ");
+                    stm1.setInt(1, order.getCustomer_id());
+                    stm1.setInt(2, order.getOrder_id());
+                    break;
+
+                case 3:
+                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET SALES_REP_ID=? WHERE ORDER_ID=? ");
+                    stm1.setInt(1, order.getSales_rep_id());
+                    stm1.setInt(2, order.getOrder_id());
+                    break;
+
+                case 4:
+                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET PROMOTION_ID=? WHERE ORDER_ID=? ");
+                    stm1.setInt(1, order.getPromotion_id());
+                    stm1.setInt(2, order.getOrder_id());
+                    break;
+
+                case 5:
+                    isUpdated = addProductToOrder(order);
+                    break;
+
+                case 6:
+                    isUpdated = deleteProductFromOrder(order);
+                    break;
+            }
+
+            if (stm1.executeUpdate()!=0) {
+                isUpdated = true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            isUpdated=false;
+        }
+
+        return isUpdated;
+    }
 
     public double updateOrderTotal(int orderId) throws SQLException {
 
@@ -200,7 +271,10 @@ public class OrderDaoImpl implements IOrderDao {
         try {
             stm1 = myconnection.prepareStatement("UPDATE ORDERS SET ORDER_STATUS = 1 WHERE ORDER_ID=?");
             stm1.setInt(1, order.getOrder_id());
-            return stm1.execute();
+            if (stm1.executeUpdate()!=0) {
+                System.out.println("Pedido " + order.getOrder_id() + " finalizado con éxito. El importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
+                return true;
+            } else return false;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -245,79 +319,6 @@ public class OrderDaoImpl implements IOrderDao {
             response.add(ordersTotal);
         }
         return response;
-    }
-
-    public boolean updateOrder(Order order, int field) throws SQLException {
-
-        boolean isUpdated = false;
-
-        try {
-
-            switch (field) {
-                case 1:
-                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET ORDER_MODE=? WHERE ORDER_ID=? ");
-                    stm1.setString(1, order.getOrder_mode());
-                    stm1.setInt(2, order.getOrder_id());
-                    rs1 = stm1.executeQuery();
-                    break;
-
-                case 2:
-                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET CUSTOMER_ID=? WHERE ORDER_ID=? ");
-                    stm1.setInt(1, order.getCustomer_id());
-                    stm1.setInt(2, order.getOrder_id());
-                    rs1 = stm1.executeQuery();
-                    break;
-
-                case 3:
-                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET SALES_REP_ID=? WHERE ORDER_ID=? ");
-                    stm1.setInt(1, order.getSales_rep_id());
-                    stm1.setInt(2, order.getOrder_id());
-                    rs1 = stm1.executeQuery();
-                    break;
-
-                case 4:
-                    stm1 = myconnection.prepareStatement(" UPDATE ORDERS SET PROMOTION_ID=? WHERE ORDER_ID=? ");
-                    stm1.setInt(1, order.getPromotion_id());
-                    stm1.setInt(2, order.getOrder_id());
-                    rs1 = stm1.executeQuery();
-                    break;
-
-                case 5:
-                    isUpdated = addProductToOrder(order);
-                    break;
-
-                case 6:
-                    isUpdated = deleteProductFromOrder(order);
-                    break;
-
-            }
-
-            if (rs1 != null) {
-                isUpdated = true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return isUpdated;
-    }
-
-
-    public boolean deleteProductFromOrder(Order order) throws SQLException {
-
-        try {
-            stm1 = myconnection.prepareStatement("DELETE FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=? ");
-            stm1.setInt(1, order.getOrder_id());
-            stm1.setInt(2, order.getProduct_id());
-            stm1.execute();
-            updateOrderTotal(order.getOrder_id());
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-
     }
 }
 

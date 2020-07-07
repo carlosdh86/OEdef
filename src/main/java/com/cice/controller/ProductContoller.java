@@ -1,25 +1,22 @@
 package com.cice.controller;
 
+import com.cice.dao.OrderDaoImpl;
 import com.cice.dao.ProductDaoImpl;
 import com.cice.idao.IProductDao;
 import com.cice.model.Product;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class ProductContoller {
 
     private static final Logger log = LoggerFactory.getLogger(ProductContoller.class);
+    ProductDaoImpl productDao = new ProductDaoImpl();
 
     public void getProductsByWarehouse(int warehouseId) throws SQLException {
-        IProductDao iProductDao = new ProductDaoImpl();
-        List<Product> products = iProductDao.getProductsByWarehouse(warehouseId);
+        List<Product> products = productDao.getProductsByWarehouse(warehouseId);
         if (products.size() == 0) {
             log.warn("No existe ningún producto en este almacen");
         } else {
@@ -30,8 +27,7 @@ public class ProductContoller {
     }
 
     public void getProductsUnder10() throws SQLException {
-        IProductDao iProductDao = new ProductDaoImpl();
-        List<Product> products = iProductDao.getProductsUnder10();
+        List<Product> products = productDao.getProductsUnder10();
         if (products.size() == 0) {
             log.warn("No existe ningún producto con menos de 10 existencias");
         } else {
@@ -42,12 +38,11 @@ public class ProductContoller {
     }
 
     public void getAllProducts(int page) throws SQLException {
-        IProductDao iProductDao = new ProductDaoImpl();
-        List<Product> products = iProductDao.getAllProducts();
-        if (getPage(products,page,5).size()==0)  {
+        List<Product> products = productDao.getAllProducts();
+        if (getPage(products,page,10).size()==0)  {
             log.warn("No existen más productos registrados");
         } else {
-            List<Product> productsPage= getPage(products, page, 5 );
+            List<Product> productsPage= getPage(products, page, 10 );
             for (Product product:productsPage) {
                 System.out.println(product);
             }
