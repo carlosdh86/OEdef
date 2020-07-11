@@ -1,4 +1,5 @@
 package com.cice.view;
+
 import com.cice.controller.ProductContoller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ public class ProductView {
                             chooseAction();
                     }
                 }
-
 
             case 2:
                 log.info("Introduce el ID del almacén");

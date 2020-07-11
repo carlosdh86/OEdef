@@ -10,6 +10,8 @@ public interface IOrderDao {
 
     public boolean addProductToOrder (Order order) throws SQLException;
 
+    public boolean checkProductAvailability (Order order) throws SQLException;
+
     public boolean deleteProductFromOrder (Order order) throws SQLException;
 
     public List<Order> getOrders() throws SQLException;
@@ -21,6 +23,8 @@ public interface IOrderDao {
     public double updateOrderTotal (int orderId) throws SQLException;
 
     public boolean finishOrder (Order order) throws SQLException;
+
+    public boolean updateQuantityOnHand (Order order) throws SQLException;
 
     public boolean deleteOrder (Order order) throws SQLException;
 

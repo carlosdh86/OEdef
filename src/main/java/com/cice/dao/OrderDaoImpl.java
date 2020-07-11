@@ -3,6 +3,7 @@ package com.cice.dao;
 import com.cice.connection.MyConnection;
 import com.cice.idao.IOrderDao;
 import com.cice.model.Order;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -49,9 +50,7 @@ public class OrderDaoImpl implements IOrderDao {
             if (isCreated) {
                 addProductToOrder(order);
             }
-        }
-
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -62,66 +61,96 @@ public class OrderDaoImpl implements IOrderDao {
 
         int line_item_id = 1;
 
-        try {
-            stm1 = myconnection.prepareStatement("SELECT PRODUCT_ID,QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=?");
-            stm1.setInt(1, order.getOrder_id());
-            stm1.setInt(2, order.getProduct_id());
-            rs1 = stm1.executeQuery();
-            if (rs1.next()) {
-                int oldQuantity = rs1.getInt(2);
-                int newQuantity = oldQuantity + order.getQuantity();
-                stm2 = myconnection.prepareStatement("UPDATE ORDER_ITEMS SET QUANTITY=? WHERE ORDER_ID=? AND PRODUCT_ID=?");
-                stm2.setInt(1, newQuantity);
-                stm2.setInt(2, order.getOrder_id());
-                stm2.setInt(3, order.getProduct_id());
-                stm2.execute();
+        if (checkProductAvailability(order)) {
 
-            } else {
-                stm3 = myconnection.prepareStatement("SELECT LIST_PRICE FROM PRODUCT_INFORMATION WHERE PRODUCT_ID=?");
-                stm3.setInt(1, order.getProduct_id());
-                rs3 = stm3.executeQuery();
-                float unitPrice = 0;
-                if (rs3.next()) {
-                    unitPrice = (rs3.getFloat(1));
+            try {
+                stm1 = myconnection.prepareStatement("SELECT PRODUCT_ID,QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=?");
+                stm1.setInt(1, order.getOrder_id());
+                stm1.setInt(2, order.getProduct_id());
+                rs1 = stm1.executeQuery();
+                if (rs1.next()) {
+                    int oldQuantity = rs1.getInt(2);
+                    int newQuantity = oldQuantity + order.getQuantity();
+                    stm2 = myconnection.prepareStatement("UPDATE ORDER_ITEMS SET QUANTITY=? WHERE ORDER_ID=? AND PRODUCT_ID=?");
+                    stm2.setInt(1, newQuantity);
+                    stm2.setInt(2, order.getOrder_id());
+                    stm2.setInt(3, order.getProduct_id());
+                    stm2.execute();
+
+                } else {
+                    stm3 = myconnection.prepareStatement("SELECT LIST_PRICE FROM PRODUCT_INFORMATION WHERE PRODUCT_ID=?");
+                    stm3.setInt(1, order.getProduct_id());
+                    rs3 = stm3.executeQuery();
+                    float unitPrice = 0;
+                    if (rs3.next()) {
+                        unitPrice = (rs3.getFloat(1));
+                    }
+
+                    stm4 = myconnection.prepareStatement("SELECT LINE_ITEM_ID FROM ORDER_ITEMS WHERE ORDER_ID = ? AND rownum <= 1 ORDER BY LINE_ITEM_ID DESC");
+                    stm4.setInt(1, order.getOrder_id());
+                    rs4 = stm4.executeQuery();
+                    if (rs4.next()) {
+                        line_item_id = (rs4.getInt(1));
+                        line_item_id = line_item_id + 1;
+                    }
+
+                    stm5 = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,UNIT_PRICE,QUANTITY) VALUES ( ? , ? , ? , ? , ?)");
+                    stm5.setInt(1, order.getOrder_id());
+                    stm5.setInt(2, line_item_id);
+                    stm5.setInt(3, order.getProduct_id());
+                    stm5.setFloat(4, unitPrice);
+                    stm5.setInt(5, order.getQuantity());
+                    stm5.execute();
                 }
 
-                stm4 = myconnection.prepareStatement("SELECT LINE_ITEM_ID FROM ORDER_ITEMS WHERE ORDER_ID = ? AND rownum <= 1 ORDER BY LINE_ITEM_ID DESC");
-                stm4.setInt(1, order.getOrder_id());
-                rs4 = stm4.executeQuery();
-                if (rs4.next()) {
-                    line_item_id = (rs4.getInt(1));
-                    line_item_id = line_item_id + 1;
-                }
+                order.setQuantity(order.getQuantity() * -1);
+                updateQuantityOnHand(order);
 
-                stm5 = myconnection.prepareStatement("INSERT INTO ORDER_ITEMS (ORDER_ID,LINE_ITEM_ID,PRODUCT_ID,UNIT_PRICE,QUANTITY) VALUES ( ? , ? , ? , ? , ?)");
-                stm5.setInt(1, order.getOrder_id());
-                stm5.setInt(2, line_item_id);
-                stm5.setInt(3, order.getProduct_id());
-                stm5.setFloat(4, unitPrice);
-                stm5.setInt(5, order.getQuantity());
-                stm5.execute();
+                updateOrderTotal(order.getOrder_id());
+                System.out.println("Producto " + order.getProduct_id() + " añadido con éxito al pedido " + order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
+                return true;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
             }
 
-            updateOrderTotal(order.getOrder_id());
-            System.out.println("Producto " + order.getProduct_id() + " añadido con éxito al pedido "+ order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
-            return true;
+        } else System.out.println("No quedan suficientes unidades de este producto");
+        return false;
+    }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    public boolean checkProductAvailability (Order order) throws SQLException {
+
+        stm1 = myconnection.prepareStatement("SELECT QUANTITY_ON_HAND FROM INVENTORIES WHERE PRODUCT_ID=?");
+        stm1.setInt(1, order.getProduct_id());
+        rs1 = stm1.executeQuery();
+        if (rs1.next()) {
+            int quantityOnHand = rs1.getInt(1);
+            if (quantityOnHand<order.getQuantity()) {
+                return false;
+            } else return true;
         }
+        return false;
     }
 
     public boolean deleteProductFromOrder(Order order) throws SQLException {
 
         try {
-            stm1 = myconnection.prepareStatement("DELETE FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=? ");
+            stm1 = myconnection.prepareStatement("SELECT QUANTITY FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=?");
             stm1.setInt(1, order.getOrder_id());
             stm1.setInt(2, order.getProduct_id());
+            rs1=stm1.executeQuery();
+            stm2 = myconnection.prepareStatement("DELETE FROM ORDER_ITEMS WHERE ORDER_ID=? AND PRODUCT_ID=? ");
+            stm2.setInt(1, order.getOrder_id());
+            stm2.setInt(2, order.getProduct_id());
 
-            if (stm1.executeUpdate()!=0) {
+            if (stm2.executeUpdate() != 0) {
+                if(rs1.next()) {
+                    order.setQuantity(rs1.getInt(1));
+                    updateQuantityOnHand(order);
+                }
                 updateOrderTotal(order.getOrder_id());
-                System.out.println("Producto " + order.getProduct_id() + " eliminado con éxito del pedido "+ order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
+                System.out.println("Producto " + order.getProduct_id() + " eliminado con éxito del pedido " + order.getOrder_id() + ". El nuevo importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
                 return true;
             } else return false;
 
@@ -224,13 +253,13 @@ public class OrderDaoImpl implements IOrderDao {
                     break;
             }
 
-            if (stm1.executeUpdate()!=0) {
+            if (stm1.executeUpdate() != 0) {
                 isUpdated = true;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            isUpdated=false;
+            isUpdated = false;
         }
 
         return isUpdated;
@@ -260,7 +289,7 @@ public class OrderDaoImpl implements IOrderDao {
             return orderTotal;
 
         } catch (SQLException e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
 
         return orderTotal;
@@ -271,7 +300,7 @@ public class OrderDaoImpl implements IOrderDao {
         try {
             stm1 = myconnection.prepareStatement("UPDATE ORDERS SET ORDER_STATUS = 1 WHERE ORDER_ID=?");
             stm1.setInt(1, order.getOrder_id());
-            if (stm1.executeUpdate()!=0) {
+            if (stm1.executeUpdate() != 0) {
                 System.out.println("Pedido " + order.getOrder_id() + " finalizado con éxito. El importe del pedido es " + new DecimalFormat("#.##").format(updateOrderTotal(order.getOrder_id())) + " €");
                 return true;
             } else return false;
@@ -280,7 +309,41 @@ public class OrderDaoImpl implements IOrderDao {
             e.printStackTrace();
             return false;
         }
+    }
 
+    public boolean updateQuantityOnHand(Order order) throws SQLException {
+        boolean isUpdated = false;
+        try {
+            stm1 = myconnection.prepareStatement("SELECT QUANTITY_ON_HAND FROM INVENTORIES WHERE PRODUCT_ID=?");
+            stm1.setInt(1, order.getProduct_id());
+            rs1 = stm1.executeQuery();
+            if (rs1.next()) {
+                int oldQuantity = (rs1.getInt(1));
+                int newQuantity = oldQuantity + order.getQuantity();
+                if (newQuantity<0) {
+                    System.out.println("Solo quedan " + oldQuantity + "unidades de este producto" );
+                    newQuantity = oldQuantity;
+                    stm2 = myconnection.prepareStatement("UPDATE ORDER_ITEMS SET QUANTITY=? WHERE ORDER_ID=? AND PRODUCT_ID=?");
+                    stm2.setInt(1, newQuantity);
+                    stm2.setInt(2, order.getOrder_id());
+                    stm2.setInt(3, order.getProduct_id());
+                    stm2.execute();
+                }
+
+                stm2 = myconnection.prepareStatement("UPDATE INVENTORIES SET QUANTITY_ON_HAND=? WHERE PRODUCT_ID=?");
+                stm2.setInt(1, newQuantity);
+                stm2.setInt(2, order.getProduct_id());
+                if (stm2.executeUpdate() != 0) {
+                    return isUpdated;
+                }
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+            isUpdated = false;
+        }
+
+        return isUpdated;
     }
 
     public boolean deleteOrder(Order order) throws SQLException {
@@ -293,7 +356,7 @@ public class OrderDaoImpl implements IOrderDao {
             stm2 = myconnection.prepareStatement("DELETE FROM ORDERS WHERE ORDER_ID=?");
             stm2.setInt(1, order.getOrder_id());
 
-            if (stm2.executeUpdate()!=0) {
+            if (stm2.executeUpdate() != 0) {
                 return true;
             } else return false;
 
